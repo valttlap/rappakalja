@@ -13,4 +13,8 @@
     <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Sanasoppa.Core\Sanasoppa.Core.csproj" />
+  </ItemGroup>
+
 </Project>

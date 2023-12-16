@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Sanasoppa.Model.model;
 
-namespace Sanasoppa.Model.context;
+namespace Sanasoppa.Model.Context;
 
 public partial class SanasoppaContext : DbContext
 {

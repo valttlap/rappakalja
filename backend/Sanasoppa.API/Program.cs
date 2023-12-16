@@ -1,3 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using Sanasoppa.API.Extensions;
+using Sanasoppa.API.Hubs;
+using Sanasoppa.Model.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddDbContext<SanasoppaContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SanasoppaDb"));
+});
+
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Environment, builder.Configuration);
+builder.Services.AddConfigurationsServices(builder.Configuration);
+
 
 var app = builder.Build();
 
@@ -20,5 +35,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<GameHub>("hubs/gamehub");
 
 app.Run();

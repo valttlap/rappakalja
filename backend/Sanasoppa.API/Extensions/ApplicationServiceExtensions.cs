@@ -1,5 +1,7 @@
-using Microsoft.OpenApi.Models;
 using Sanasoppa.API.Exceptions;
+using Sanasoppa.Core.Helpers;
+using Sanasoppa.Core.Repositories;
+using Sanasoppa.Core.Services;
 
 namespace Sanasoppa.API.Extensions;
 
@@ -18,6 +20,11 @@ public static class ApplicationServiceExtensions
                     .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
             });
         });
+
+        services.AddSignalR();
+        services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AutomapperProfiles)), AppDomain.CurrentDomain.GetAssemblies());
+        services.AddScoped<UnitOfWork>();
+        services.AddScoped<GameService>();
 
         services.AddOpenApiDocument(config =>
         {
