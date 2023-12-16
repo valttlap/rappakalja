@@ -1,6 +1,6 @@
 using AutoMapper;
 using Sanasoppa.Core.DTOs;
-using Sanasoppa.Model.Model;
+using Sanasoppa.Model.Entities;
 
 namespace Sanasoppa.Core.Helpers;
 

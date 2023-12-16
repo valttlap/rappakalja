@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sanasoppa.Model.Model;
+namespace Sanasoppa.Model.Entities;
 
 public partial class Score
 {

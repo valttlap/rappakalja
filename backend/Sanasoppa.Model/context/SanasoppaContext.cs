@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Sanasoppa.Model.Model;
+using Sanasoppa.Model.Entities;
 
 namespace Sanasoppa.Model.Context;
 
