@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Sanasoppa.Model.model;
+using Sanasoppa.Model.Model;
 
 namespace Sanasoppa.Model.Context;
 
@@ -40,7 +40,12 @@ public partial class SanasoppaContext : DbContext
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .HasColumnName("id");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
+            entity.Property(e => e.OwnerId).HasColumnName("owner_id");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
+
+            entity.HasOne(d => d.Owner).WithMany(p => p.GameSessions)
+                .HasForeignKey(d => d.OwnerId)
+                .HasConstraintName("game_session_owner_id_fkey");
         });
 
         modelBuilder.Entity<Player>(entity =>

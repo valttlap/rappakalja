@@ -31,11 +31,7 @@ public class GameService
 
     public async Task<GameSessionDto> GetGameSessionByIdAsync(Guid id)
     {
-        var gameSession = await _unitOfWork.GameRepository.GetGameSessionByIdAsync(id);
-        if (gameSession == null)
-        {
-            throw new NotFoundException($"Game session with id {id} not found");
-        }
+        var gameSession = await _unitOfWork.GameRepository.GetGameSessionByIdAsync(id) ?? throw new NotFoundException($"Game session with id {id} not found");
         return _mapper.Map<GameSessionDto>(gameSession);
     }
 }

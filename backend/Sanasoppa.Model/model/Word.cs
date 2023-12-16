@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sanasoppa.Model.model;
+namespace Sanasoppa.Model.Model;
 
 public partial class Word
 {

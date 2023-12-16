@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sanasoppa.Model.model;
+namespace Sanasoppa.Model.Model;
 
 public partial class Player
 {
@@ -12,6 +12,8 @@ public partial class Player
     public Guid GameSessionId { get; set; }
 
     public virtual GameSession GameSession { get; set; } = null!;
+
+    public virtual ICollection<GameSession> GameSessions { get; set; } = new List<GameSession>();
 
     public virtual ICollection<Round> Rounds { get; set; } = new List<Round>();
 
