@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanasoppa.DBUpdater", "Sana
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanasoppa.Model", "Sanasoppa.Model\Sanasoppa.Model.csproj", "{81E9B237-E7F1-4109-9735-4D8C3023099F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanasoppa.API", "Sanasoppa.API\Sanasoppa.API.csproj", "{DCB8D622-A65E-451F-8322-ACCA70DD8F0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{81E9B237-E7F1-4109-9735-4D8C3023099F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81E9B237-E7F1-4109-9735-4D8C3023099F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81E9B237-E7F1-4109-9735-4D8C3023099F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCB8D622-A65E-451F-8322-ACCA70DD8F0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCB8D622-A65E-451F-8322-ACCA70DD8F0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCB8D622-A65E-451F-8322-ACCA70DD8F0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCB8D622-A65E-451F-8322-ACCA70DD8F0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
