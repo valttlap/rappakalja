@@ -24,8 +24,6 @@ public partial class SanasoppaContext : DbContext
 
     public virtual DbSet<Vote> Votes { get; set; }
 
-    public virtual DbSet<Word> Words { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("uuid-ossp");
@@ -36,10 +34,13 @@ public partial class SanasoppaContext : DbContext
 
             entity.ToTable("game_session", "sanasoppa");
 
+            entity.HasIndex(e => e.JoinCode, "game_session_join_code_key").IsUnique();
+
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .HasColumnName("id");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
+            entity.Property(e => e.JoinCode).HasColumnName("join_code");
             entity.Property(e => e.OwnerId).HasColumnName("owner_id");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
 
@@ -54,11 +55,14 @@ public partial class SanasoppaContext : DbContext
 
             entity.ToTable("player", "sanasoppa");
 
+            entity.HasIndex(e => e.ConnectionId, "player_connection_id_key").IsUnique();
+
             entity.HasIndex(e => new { e.Name, e.GameSessionId }, "player_name_game_session_id_key").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .HasColumnName("id");
+            entity.Property(e => e.ConnectionId).HasColumnName("connection_id");
             entity.Property(e => e.GameSessionId).HasColumnName("game_session_id");
             entity.Property(e => e.Name).HasColumnName("name");
 
@@ -81,6 +85,7 @@ public partial class SanasoppaContext : DbContext
             entity.Property(e => e.GameSessionId).HasColumnName("game_session_id");
             entity.Property(e => e.LeaderId).HasColumnName("leader_id");
             entity.Property(e => e.RoundNumber).HasColumnName("round_number");
+            entity.Property(e => e.Word).HasColumnName("word");
 
             entity.HasOne(d => d.GameSession).WithMany(p => p.Rounds)
                 .HasForeignKey(d => d.GameSessionId)
@@ -165,25 +170,6 @@ public partial class SanasoppaContext : DbContext
             entity.HasOne(d => d.Voter).WithMany(p => p.Votes)
                 .HasForeignKey(d => d.VoterId)
                 .HasConstraintName("vote_voter_id_fkey");
-        });
-
-        modelBuilder.Entity<Word>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("word_pkey");
-
-            entity.ToTable("word", "sanasoppa");
-
-            entity.HasIndex(e => new { e.RoundId, e.Word1 }, "word_round_id_word_key").IsUnique();
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("uuid_generate_v4()")
-                .HasColumnName("id");
-            entity.Property(e => e.RoundId).HasColumnName("round_id");
-            entity.Property(e => e.Word1).HasColumnName("word");
-
-            entity.HasOne(d => d.Round).WithMany(p => p.Words)
-                .HasForeignKey(d => d.RoundId)
-                .HasConstraintName("word_round_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

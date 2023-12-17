@@ -1,0 +1,1 @@
+dotnet ef dbcontext scaffold "Server=127.0.0.1;Port=5432;Database=sanasoppa;User Id=postgres;Password=TYvYU4PXwCsyYbft;" Npgsql.EntityFrameworkCore.PostgreSQL --context-dir Context -o Entities --no-onconfiguring --schema sanasoppa

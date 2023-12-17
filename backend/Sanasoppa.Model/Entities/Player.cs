@@ -11,6 +11,8 @@ public partial class Player
 
     public Guid GameSessionId { get; set; }
 
+    public string ConnectionId { get; set; } = null!;
+
     public virtual GameSession GameSession { get; set; } = null!;
 
     public virtual ICollection<GameSession> GameSessions { get; set; } = new List<GameSession>();

@@ -25,6 +25,8 @@ public static class ApplicationServiceExtensions
         services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AutomapperProfiles)), AppDomain.CurrentDomain.GetAssemblies());
         services.AddScoped<UnitOfWork>();
         services.AddScoped<GameService>();
+        services.AddScoped<PlayerService>();
+        services.AddScoped<RoundService>();
 
         services.AddOpenApiDocument(config =>
         {

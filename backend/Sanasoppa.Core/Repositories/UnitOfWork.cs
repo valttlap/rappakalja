@@ -12,6 +12,8 @@ public class UnitOfWork
     }
 
     public GameRepository GameRepository => new(_context);
+    public PlayerRepository PlayerRepository => new(_context);
+    public RoundRepository RoundRepository => new(_context);
 
     public async Task<int> SaveChangesAsync()
     {

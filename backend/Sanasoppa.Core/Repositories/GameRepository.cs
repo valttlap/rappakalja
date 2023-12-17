@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Sanasoppa.Core.Exceptions;
 using Sanasoppa.Model.Context;
@@ -20,10 +21,21 @@ public class GameRepository
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task<GameSession> CreateGameSessionAsync()
     {
-        var gameSession = new GameSession();
-        var gameSessionEntity = await _context.GameSessions.AddAsync(gameSession);
-        return gameSessionEntity.Entity;
+        while (true)
+        {
+            var gameSession = new GameSession
+            {
+                JoinCode = GenerateRandomString(6)
+            };
+            if (!await JoinCodeExistsAsync(gameSession.JoinCode))
+            {
+                var gameSessionEntity = await _context.GameSessions.AddAsync(gameSession);
+                return gameSessionEntity.Entity;
+            }
+
+        }
     }
+
 
     /// <summary>
     /// Gets all game sessions asynchronously.
@@ -44,24 +56,9 @@ public class GameRepository
         return await _context.GameSessions.Include(g => g.Players).Include(g => g.Rounds).SingleOrDefaultAsync(g => g.Id == id);
     }
 
-    /// <summary>
-    /// Adds a player to a game session asynchronously.
-    /// </summary>
-    /// <param name="gameSessionId">The ID of the game session.</param>
-    /// <param name="player">The player to add.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="AlreadyInGameException">Thrown when the player is already in the game session.</exception>
-    /// <exception cref="NotFoundException">Thrown when the game session is not found.</exception>
-    public async Task AddPlayerToGameSessionAsync(Guid gameSessionId, Player player)
+    public async Task<GameSession?> GetGameSessionByJoinCodeAsync(string joinCode)
     {
-        var gameSession = await _context.GameSessions.Include(g => g.Players).SingleOrDefaultAsync(g => g.Id == gameSessionId) ?? throw new NotFoundException($"Game session with id {gameSessionId} not found");
-        if (gameSession.Players.Any(p => p.Id == player.Id))
-        {
-            throw new AlreadyInGameException($"Player with id {player.Id} is already in game session with id {gameSessionId}");
-        }
-        gameSession.OwnerId ??= player.Id;
-        gameSession.Players.Add(player);
-        Update(gameSession);
+        return await _context.GameSessions.Include(g => g.Players).Include(g => g.Rounds).SingleOrDefaultAsync(g => g.JoinCode == joinCode);
     }
 
     /// <summary>
@@ -106,8 +103,59 @@ public class GameRepository
         Update(gameSession);
     }
 
+    public async Task<Player?> GetOwnerAsync(Guid gameSessionId)
+    {
+        var gameSession = await _context.GameSessions.Include(g => g.Players).SingleOrDefaultAsync(g => g.Id == gameSessionId) ?? throw new NotFoundException($"Game session with id {gameSessionId} not found");
+        return gameSession.Players.SingleOrDefault(p => p.Id == gameSession.OwnerId);
+    }
+
+    public async Task SetOwnerAsync(Guid gameSessionId, Guid playerId)
+    {
+        var gameSession = await _context.GameSessions.Include(g => g.Players).SingleOrDefaultAsync(g => g.Id == gameSessionId) ?? throw new NotFoundException($"Game session with id {gameSessionId} not found");
+        var player = gameSession.Players.SingleOrDefault(p => p.Id == playerId) ?? throw new NotFoundException($"Player with id {playerId} not found in game session with id {gameSessionId}");
+        gameSession.OwnerId = player.Id;
+        Update(gameSession);
+    }
+
     public void Update(GameSession gameSession)
     {
         _context.Entry(gameSession).State = EntityState.Modified;
     }
+
+    private Task<bool> JoinCodeExistsAsync(string joinCode)
+    {
+        return _context.GameSessions.AnyAsync(g => g.JoinCode == joinCode);
+    }
+
+    private static string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        using var rng = RandomNumberGenerator.Create();
+        var stringChars = new char[length];
+        var byteBuffer = new byte[1];
+
+        for (int i = 0; i < stringChars.Length; i++)
+        {
+            int num;
+            do
+            {
+                rng.GetBytes(byteBuffer);
+                num = byteBuffer[0];
+            } while (!IsValidCharValue(num, chars.Length));
+
+            stringChars[i] = chars[num % chars.Length];
+        }
+
+        return new string(stringChars);
+    }
+
+    private static bool IsValidCharValue(int value, int max)
+    {
+        // MaxValue depends on the length of the character set used
+        // Avoid numbers that are not evenly divisible by the character set length
+        // to prevent character frequency bias
+        int maxValue = 256 / max * max;
+        return value < maxValue;
+    }
+
 }

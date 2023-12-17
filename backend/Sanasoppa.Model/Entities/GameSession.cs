@@ -13,6 +13,8 @@ public partial class GameSession
 
     public Guid? OwnerId { get; set; }
 
+    public string? JoinCode { get; set; }
+
     public virtual Player? Owner { get; set; }
 
     public virtual ICollection<Player> Players { get; set; } = new List<Player>();

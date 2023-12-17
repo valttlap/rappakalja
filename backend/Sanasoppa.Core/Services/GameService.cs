@@ -2,7 +2,6 @@ using AutoMapper;
 using Sanasoppa.Core.DTOs;
 using Sanasoppa.Core.Exceptions;
 using Sanasoppa.Core.Repositories;
-using Sanasoppa.Model.Entities;
 
 namespace Sanasoppa.Core.Services;
 
@@ -36,21 +35,15 @@ public class GameService
         return _mapper.Map<GameSessionDto>(gameSession);
     }
 
-    public async Task AddPlayerToGameSessionAsync(Guid gameSessionId, PlayerDto playerDto)
+    public async Task<GameSessionDto> GetGameSessionByJoinCodeAsync(string joinCode)
     {
-        var player = _mapper.Map<Player>(playerDto);
-        try
-        {
-            await _unitOfWork.GameRepository.AddPlayerToGameSessionAsync(gameSessionId, player);
-        }
-        catch (AlreadyInGameException)
-        {
-            throw;
-        }
-        catch (NotFoundException)
-        {
-            throw;
-        }
+        var gameSession = await _unitOfWork.GameRepository.GetGameSessionByJoinCodeAsync(joinCode) ?? throw new NotFoundException($"Game session with join code {joinCode} not found");
+        return _mapper.Map<GameSessionDto>(gameSession);
+    }
+
+    public async Task StartGameSessionAsync(Guid id)
+    {
+        await _unitOfWork.GameRepository.StartGameAsync(id);
         await _unitOfWork.SaveChangesAsync();
     }
 }
