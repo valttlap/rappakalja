@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.SignalR;
 using Sanasoppa.Core.DTOs;
 using Sanasoppa.Core.Services;
@@ -9,12 +10,16 @@ public class GameHub : Hub
     private readonly GameService _gameService;
     private readonly PlayerService _playerService;
     private readonly RoundService _roundService;
+    private readonly SubmissionService _submissionService;
+    private readonly VoteService _voteService;
 
-    public GameHub(GameService gameService, PlayerService playerService, RoundService roundService)
+    public GameHub(GameService gameService, PlayerService playerService, RoundService roundService, SubmissionService submissionService, VoteService voteService)
     {
         _gameService = gameService;
         _playerService = playerService;
         _roundService = roundService;
+        _submissionService = submissionService;
+        _voteService = voteService;
     }
 
     public override async Task OnConnectedAsync()
@@ -78,5 +83,94 @@ public class GameHub : Hub
         var roundGuid = Guid.TryParse(round.Id, out var roundId) ? roundId : throw new ArgumentException("Invalid round id");
         await _roundService.AddWordToRoundAsync(roundGuid, word);
         await Clients.Group(gameId).SendAsync("WordSubmitted", word);
+    }
+
+    public async Task SumbitSubmission(string gameId, string submission)
+    {
+        var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");
+        var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
+        var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(gameGuid) ?? throw new InvalidOperationException("No round found");
+        var submissionDto = new SubmissionDto()
+        {
+            PlayerId = player.Id,
+            Guess = submission,
+            RoundId = round.Id
+        };
+        await _submissionService.CreateAsync(submissionDto);
+        if (await _roundService.AllPlayersSubmittedAsync(Guid.Parse(round.Id)))
+        {
+            await Clients.Group(gameId).SendAsync("AllPlayersSubmitted");
+            var leader = await _playerService.GetPlayerByIdAsync(Guid.Parse(round.LeaderId));
+            var submissions = await _submissionService.GetSubmissionsByRoundIdAsync(Guid.Parse(round.Id));
+            await Clients.Client(leader.ConnectionId).SendAsync("ReadSubmissions", submissions);
+        }
+        await Clients.Group(gameId).SendAsync("SubmissionSubmitted", await _roundService.GetSubmissionsDoneAsync(Guid.Parse(round.Id)));
+    }
+
+    public async Task RestartRound(string gameId)
+    {
+        var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
+        var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(Guid.Parse(gameId)) ?? throw new InvalidOperationException("No round found");
+        if (player.Id != round.LeaderId)
+        {
+            throw new InvalidOperationException("Only the leader can restart the round");
+        }
+        var newRound = await _roundService.ResetRoundAsync(Guid.Parse(round.Id));
+        await Clients.Client(player.ConnectionId).SendAsync("SubmitWord", newRound);
+
+    }
+
+    public async Task EndRound(string gameId)
+    {
+        var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
+        var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(Guid.Parse(gameId)) ?? throw new InvalidOperationException("No round found");
+        if (player.Id != round.LeaderId)
+        {
+            throw new InvalidOperationException("Only the leader can restart the round");
+        }
+        var newRound = await _roundService.StartNewRoundAsync(gameId);
+        await Clients.Group(gameId).SendAsync("RoundEnded", newRound);
+        var newLeader = await _playerService.GetPlayerByIdAsync(Guid.Parse(newRound.LeaderId));
+        await Clients.Client(newLeader.ConnectionId).SendAsync("SubmitWord", newRound);
+    }
+
+
+
+    public async Task StartVoting(string gameId)
+    {
+        var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");
+        var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
+        var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(gameGuid) ?? throw new InvalidOperationException("No round found");
+        if (player.Id != round.LeaderId)
+        {
+            throw new InvalidOperationException("Only the leader can start voting");
+        }
+        var submissions = await _submissionService.GetSubmissionsByRoundIdAsync(Guid.Parse(round.Id));
+        await Clients.Group(gameId).SendAsync("VotingStarted", submissions);
+    }
+
+    public async Task CastVote(string gameId, string submissionId)
+    {
+        var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");
+        var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
+        var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(gameGuid) ?? throw new InvalidOperationException("No round found");
+        if (player.Id == round.LeaderId)
+        {
+            throw new InvalidOperationException("The leader cannot vote");
+        }
+        var voteDto = new VoteDto()
+        {
+            VoterId = player.Id,
+            SubmissionId = submissionId,
+            RoundId = round.Id
+        };
+        await _voteService.CreateAsync(voteDto);
+        var votesDone = await _roundService.GetVotesDoneAsync(Guid.Parse(round.Id));
+        if (votesDone.SubmissionsDone == votesDone.SubmissionsTotal)
+        {
+            await Clients.Group(gameId).SendAsync("AllVotesCast");
+            return;
+        }
+        await Clients.Group(gameId).SendAsync("VoteCast", votesDone);
     }
 }

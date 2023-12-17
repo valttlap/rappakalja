@@ -1,5 +1,6 @@
 using AutoMapper;
 using Sanasoppa.Core.DTOs;
+using Sanasoppa.Core.Exceptions;
 using Sanasoppa.Core.Repositories;
 using Sanasoppa.Model.Entities;
 
@@ -46,5 +47,59 @@ public class RoundService
     {
         await _unitOfWork.RoundRepository.AddWordToRoundAsync(roundId, word);
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<SubmissionsDoneDto> GetSubmissionsDoneAsync(Guid roundId)
+    {
+        var round = await _unitOfWork.RoundRepository.GetByIdAsync(roundId) ?? throw new NotFoundException($"Round with id {roundId} not found");
+        var game = await _unitOfWork.GameRepository.GetGameSessionByIdAsync(round.GameSessionId) ?? throw new NotFoundException($"Game session with id {round.GameSessionId} not found");
+        var submissions = await _unitOfWork.SubmissionRepository.GetSubmissionsByRoundIdAsync(roundId);
+        var submissionsDone = new SubmissionsDoneDto
+        {
+            SubmissionsDone = submissions.Count(),
+            SubmissionsTotal = game.Players.Count
+        };
+        return submissionsDone;
+    }
+
+    public async Task<bool> AllPlayersSubmittedAsync(Guid roundId)
+    {
+        var round = await _unitOfWork.RoundRepository.GetByIdAsync(roundId) ?? throw new NotFoundException($"Round with id {roundId} not found");
+        var game = await _unitOfWork.GameRepository.GetGameSessionByIdAsync(round.GameSessionId) ?? throw new NotFoundException($"Game session with id {round.GameSessionId} not found");
+        var submissions = await _unitOfWork.SubmissionRepository.GetSubmissionsByRoundIdAsync(roundId);
+        if (game.Players.Count == submissions.Count())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<SubmissionsDoneDto> GetVotesDoneAsync(Guid roundId)
+    {
+        var round = await _unitOfWork.RoundRepository.GetByIdAsync(roundId) ?? throw new NotFoundException($"Round with id {roundId} not found");
+        var votes = await _unitOfWork.VoteRepository.GetVotesByRoundIdAsync(roundId);
+        var playersInGame = (await _unitOfWork.GameRepository.GetGameSessionByIdAsync(round.GameSessionId) ?? throw new NotFoundException($"Game session with id {round.GameSessionId} not found")).Players.Count;
+        var votesDone = new SubmissionsDoneDto
+        {
+            SubmissionsDone = votes.Count(),
+            SubmissionsTotal = playersInGame - 1
+        };
+
+        return votesDone;
+    }
+
+    public async Task<RoundDto> StartNewRoundAsync(string gameId)
+    {
+        var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");
+        var round = await _unitOfWork.RoundRepository.StartNewRound(gameGuid);
+        await _unitOfWork.SaveChangesAsync();
+        return _mapper.Map<RoundDto>(round);
+    }
+
+    public async Task<RoundDto> ResetRoundAsync(Guid roundId)
+    {
+        var round = await _unitOfWork.RoundRepository.ResetRoundAsync(roundId);
+        await _unitOfWork.SaveChangesAsync();
+        return _mapper.Map<RoundDto>(round);
     }
 }
