@@ -37,4 +37,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<GameHub>("hubs/gamehub");
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.Run();

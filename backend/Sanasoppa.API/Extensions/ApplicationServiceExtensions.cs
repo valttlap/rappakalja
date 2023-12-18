@@ -17,6 +17,7 @@ public static class ApplicationServiceExtensions
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()
+                    .AllowAnyOrigin()
                     .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
             });
         });
@@ -27,6 +28,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<GameService>();
         services.AddScoped<PlayerService>();
         services.AddScoped<RoundService>();
+        services.AddScoped<SubmissionService>();
 
         services.AddOpenApiDocument(config =>
         {

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.SignalR;
 using Sanasoppa.Core.DTOs;
 using Sanasoppa.Core.Services;
@@ -11,27 +10,15 @@ public class GameHub : Hub
     private readonly PlayerService _playerService;
     private readonly RoundService _roundService;
     private readonly SubmissionService _submissionService;
-    private readonly VoteService _voteService;
 
-    public GameHub(GameService gameService, PlayerService playerService, RoundService roundService, SubmissionService submissionService, VoteService voteService)
+    public GameHub(GameService gameService, PlayerService playerService, RoundService roundService, SubmissionService submissionService)
     {
         _gameService = gameService;
         _playerService = playerService;
         _roundService = roundService;
         _submissionService = submissionService;
-        _voteService = voteService;
     }
 
-    public override async Task OnConnectedAsync()
-    {
-        await base.OnConnectedAsync();
-    }
-
-
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        await base.OnDisconnectedAsync(exception);
-    }
     public async Task JoinGame(string joinCode, string name)
     {
         var gameSession = await _gameService.GetGameSessionByJoinCodeAsync(joinCode);
@@ -45,6 +32,7 @@ public class GameHub : Hub
 
         await _playerService.CreatePlayerAsync(player);
         await Groups.AddToGroupAsync(Context.ConnectionId, gameSession.Id);
+        await Clients.Group(gameSession.Id).SendAsync("PlayerJoined", player);
     }
 
     public async Task StartGame(string gameId)
@@ -147,30 +135,5 @@ public class GameHub : Hub
         }
         var submissions = await _submissionService.GetSubmissionsByRoundIdAsync(Guid.Parse(round.Id));
         await Clients.Group(gameId).SendAsync("VotingStarted", submissions);
-    }
-
-    public async Task CastVote(string gameId, string submissionId)
-    {
-        var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");
-        var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
-        var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(gameGuid) ?? throw new InvalidOperationException("No round found");
-        if (player.Id == round.LeaderId)
-        {
-            throw new InvalidOperationException("The leader cannot vote");
-        }
-        var voteDto = new VoteDto()
-        {
-            VoterId = player.Id,
-            SubmissionId = submissionId,
-            RoundId = round.Id
-        };
-        await _voteService.CreateAsync(voteDto);
-        var votesDone = await _roundService.GetVotesDoneAsync(Guid.Parse(round.Id));
-        if (votesDone.SubmissionsDone == votesDone.SubmissionsTotal)
-        {
-            await Clients.Group(gameId).SendAsync("AllVotesCast");
-            return;
-        }
-        await Clients.Group(gameId).SendAsync("VoteCast", votesDone);
     }
 }

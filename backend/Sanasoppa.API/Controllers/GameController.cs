@@ -57,4 +57,24 @@ public class GameController : ApiBaseController
         var gameSession = await _gameService.CreateGameSessionAsync();
         return Created($"api/game/{gameSession.Id}", gameSession);
     }
+
+    [HttpGet("{id}/players")]
+    [SwaggerResponse(HttpStatusCode.OK, typeof(IEnumerable<PlayerDto>), Description = "Returns all players in a game session")]
+    [SwaggerResponse(HttpStatusCode.NotFound, null, Description = "Game session not found")]
+    [SwaggerResponse(HttpStatusCode.InternalServerError, null, Description = "Internal server error")]
+    [OpenApiOperation("GetPlayersByGameSessionId")]
+    [Description("Returns all players in a game session")]
+    public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayersByGameSessionIdAsync(Guid id)
+    {
+        try
+        {
+            var players = await _gameService.GetPlayersByGameSessionIdAsync(id);
+            return Ok(players);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+    }
+
 }

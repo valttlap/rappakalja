@@ -10,7 +10,7 @@ import {
 })
 export class GameHubService {
   private _hubConnection?: HubConnection;
-  private hubUrl = 'https://localhost:5001/gamehub';
+  private hubUrl = `${window.location.origin}/hubs/gamehub`;
 
   constructor() {}
 

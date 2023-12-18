@@ -41,6 +41,12 @@ public class GameService
         return _mapper.Map<GameSessionDto>(gameSession);
     }
 
+    public async Task<IEnumerable<PlayerDto>> GetPlayersByGameSessionIdAsync(Guid gameSessionId)
+    {
+        var game = await _unitOfWork.GameRepository.GetGameSessionByIdAsync(gameSessionId) ?? throw new NotFoundException($"Game session with id {gameSessionId} not found");
+        return _mapper.Map<IEnumerable<PlayerDto>>(game.Players);
+    }
+
     public async Task StartGameSessionAsync(Guid id)
     {
         await _unitOfWork.GameRepository.StartGameAsync(id);

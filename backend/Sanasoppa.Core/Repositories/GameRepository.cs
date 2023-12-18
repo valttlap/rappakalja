@@ -58,7 +58,7 @@ public class GameRepository
 
     public async Task<GameSession?> GetGameSessionByJoinCodeAsync(string joinCode)
     {
-        return await _context.GameSessions.Include(g => g.Players).Include(g => g.Rounds).SingleOrDefaultAsync(g => g.JoinCode == joinCode);
+        return await _context.GameSessions.SingleOrDefaultAsync(g => g.JoinCode == joinCode);
     }
 
     /// <summary>
