@@ -21,7 +21,7 @@ public class SubmissionRepository
 
     public async Task<IEnumerable<Submission>> GetSubmissionsByRoundIdAsync(Guid roundId)
     {
-        return await _context.Submissions.Where(s => s.RoundId == roundId).ToListAsync();
+        return await _context.Submissions.Include(s => s.Player).Where(s => s.RoundId == roundId).ToListAsync();
     }
 
     public async Task<IEnumerable<Submission>> GetNotCorrectSubmissionsByRoundIdAsync(Guid roundId)

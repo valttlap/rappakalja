@@ -24,10 +24,10 @@ public class SubmissionService
         return _mapper.Map<SubmissionDto>(submissionEntity);
     }
 
-    public async Task<IEnumerable<SubmissionDto>> GetSubmissionsByRoundIdAsync(Guid roundId)
+    public async Task<IEnumerable<SubmissionReturnDto>> GetSubmissionsByRoundIdAsync(Guid roundId)
     {
         var submissions = await _unitOfWork.SubmissionRepository.GetSubmissionsByRoundIdAsync(roundId);
-        return _mapper.Map<IEnumerable<SubmissionDto>>(submissions);
+        return _mapper.Map<IEnumerable<SubmissionReturnDto>>(submissions);
     }
 
     public async Task<IEnumerable<SubmissionDto>> GetNotCorrectSubmissionsByRoundIdAsync(Guid roundId)

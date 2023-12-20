@@ -19,7 +19,7 @@ public class GameHub : Hub
         _submissionService = submissionService;
     }
 
-    public async Task JoinGame(string joinCode, string name)
+    public async Task<string> JoinGame(string joinCode, string name)
     {
         var gameSession = await _gameService.GetGameSessionByJoinCodeAsync(joinCode);
         var player = new PlayerDto()
@@ -33,6 +33,8 @@ public class GameHub : Hub
         await _playerService.CreatePlayerAsync(player);
         await Groups.AddToGroupAsync(Context.ConnectionId, gameSession.Id);
         await Clients.Group(gameSession.Id).SendAsync("PlayerJoined", player);
+
+        return gameSession.Id;
     }
 
     public async Task StartGame(string gameId)
@@ -73,13 +75,14 @@ public class GameHub : Hub
         await Clients.Group(gameId).SendAsync("WordSubmitted", word);
     }
 
-    public async Task SumbitSubmission(string gameId, string submission)
+    public async Task SubmitSubmission(string gameId, string submission)
     {
         var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");
         var player = await _playerService.GetPlayerByConnectionIdAsync(Context.ConnectionId);
         var round = await _roundService.GetCurrentRoundByGameSessionIdAsync(gameGuid) ?? throw new InvalidOperationException("No round found");
         var submissionDto = new SubmissionDto()
         {
+            Id = Guid.NewGuid().ToString(),
             PlayerId = player.Id,
             Guess = submission,
             RoundId = round.Id
@@ -119,7 +122,7 @@ public class GameHub : Hub
         var newRound = await _roundService.StartNewRoundAsync(gameId);
         await Clients.Group(gameId).SendAsync("RoundEnded", newRound);
         var newLeader = await _playerService.GetPlayerByIdAsync(Guid.Parse(newRound.LeaderId));
-        await Clients.Client(newLeader.ConnectionId).SendAsync("SubmitWord", newRound);
+        await Clients.Client(newLeader.ConnectionId).SendAsync("NewLeader", newRound);
     }
 
 

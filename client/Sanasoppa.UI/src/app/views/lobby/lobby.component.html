@@ -1,0 +1,14 @@
+<div class="container">
+  <h2>Liity koodilla: {{ gameService.joinCode }}</h2>
+  <ul class="list-group me-3">
+    <li class="list-group-item" *ngFor="let player of players()">
+      {{ player }}
+    </li>
+  </ul>
+  <button
+    *ngIf="isOwner()"
+    class="btn btn-lg btn-primary"
+    (click)="startGame()">
+    Aloita peli
+  </button>
+</div>

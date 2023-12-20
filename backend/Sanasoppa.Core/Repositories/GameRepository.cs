@@ -99,7 +99,7 @@ public class GameRepository
         {
             throw new NotEnoughPlayersException($"Not enough players in game session with id {gameSessionId}");
         }
-        gameSession.StartTime = DateTime.Now;
+        gameSession.StartTime = DateTime.UtcNow;
         Update(gameSession);
     }
 
