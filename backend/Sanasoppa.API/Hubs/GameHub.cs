@@ -21,6 +21,7 @@ public class GameHub : Hub
 
     public async Task<string> JoinGame(string joinCode, string name)
     {
+        joinCode = joinCode.ToLower();
         var gameSession = await _gameService.GetGameSessionByJoinCodeAsync(joinCode);
         var player = new PlayerDto()
         {

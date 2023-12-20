@@ -25,7 +25,7 @@ public class GameRepository
         {
             var gameSession = new GameSession
             {
-                JoinCode = GenerateRandomString(6)
+                JoinCode = GenerateRandomString(4)
             };
             if (!await JoinCodeExistsAsync(gameSession.JoinCode))
             {
@@ -129,7 +129,7 @@ public class GameRepository
 
     private static string GenerateRandomString(int length)
     {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const string chars = "abcdefghijklmnopqrstuvwxyz";
         using var rng = RandomNumberGenerator.Create();
         var stringChars = new char[length];
         var byteBuffer = new byte[1];
