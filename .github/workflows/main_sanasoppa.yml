@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - sanasoppa
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://sanasoppa.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_0b23776546f248af87980397a5d3497b }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_e1808acabee04ac3bc1d7eaf4213b828 }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: sanasoppa.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_0b23776546f248af87980397a5d3497b }}/sanasoppa:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'sanasoppa'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_7c32c45aa6fb4e0fb77fe674f126df26 }}
+        images: 'sanasoppa.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_0b23776546f248af87980397a5d3497b }}/sanasoppa:${{ github.sha }}'
