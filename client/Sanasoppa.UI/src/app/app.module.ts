@@ -20,9 +20,7 @@ import { GameComponent } from './views/game/game.component';
     GameComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, NgbModule, HttpClientModule],
-  providers: [
-    { provide: API_BASE_URL, useValue: `${window.location.origin}/api` },
-  ],
+  providers: [{ provide: API_BASE_URL, useValue: `${window.location.origin}` }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
