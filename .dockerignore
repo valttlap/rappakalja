@@ -1,0 +1,51 @@
+# .NET specific ignores
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og*/
+**/[Dd]ebug/
+**/[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+**/*.pidb
+**/*.vspscc
+**/*.userprefs
+**/packages/
+*.nupkg
+*.nuspec
+**/wwwroot/
+
+# Angular specific ignores
+**/node_modules/
+**/dist/
+**/out-tsc/
+*.log
+*.sourcemaps
+*.map
+
+# Ignore all environment specific files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Version control directories
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Editor directories and files
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
