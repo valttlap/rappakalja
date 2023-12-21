@@ -1,0 +1,66 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+	"name": "C# (.NET) Sanasoppa",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "sanasoppa-devcontainer",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		"5434:5432"
+	],
+	"postCreateCommand": "dotnet restore /workspaces/sanasoppa/backend/Sanasoppa.sln",
+	"postStartCommand": "/workspaces/sanasoppa/.devcontainer/run_dbupdater.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csdevkit",
+				"ms-dotnettools.vscodeintellicode-csharp",
+				"Angular.ng-template",
+				"cyrilletuzi.angular-schematics",
+				"PKief.material-icon-theme",
+				"aaron-bond.better-comments",
+				"usernamehw.errorlens",
+				"GitHub.github-vscode-theme",
+				"EditorConfig.EditorConfig",
+				"mtxr.sqltools",
+				"esbenp.prettier-vscode",
+				"dbaeumer.vscode-eslint",
+				"christian-kohler.npm-intellisense",
+				"christian-kohler.path-intellisense",
+				"yzhang.markdown-all-in-one",
+				"meganrogge.template-string-converter"
+			]
+		}
+	},
+	"hostRequirements": {
+		"cpus": 2,
+		"memory": "4gb",
+		"storage": "10gb",
+		"gpu": false
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "lts",
+			"nvmVersion": "latest"
+		},
+		"ghcr.io/devcontainers-contrib/features/angular-cli:2": {
+			"version": "latest"
+		}
+	}
+
+	// "portsAttributes": {
+	//		"5001": {
+	//			"protocol": "https"
+	//		}
+	// }
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// Configure tool-specific properties.
+	// "customizations": {},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
