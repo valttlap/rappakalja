@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  sanasoppa-devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:delegated
+    network_mode: service:sanasoppa-db
+    command: sleep infinity
+
+  sanasoppa-db:
+    hostname: sanasoppa.db.local
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+
+volumes:
+  postgres-data:
