@@ -129,7 +129,7 @@ public class GameRepository
 
     private static string GenerateRandomString(int length)
     {
-        const string chars = "abcdefghijklmnopqrstuvwxyz";
+        const string chars = "aehijklmnoprstuvöä";
         using var rng = RandomNumberGenerator.Create();
         var stringChars = new char[length];
         var byteBuffer = new byte[1];
