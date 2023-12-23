@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Sanasoppa.Core.DTOs;
 using Sanasoppa.Core.Services;
+using Sanasoppa.API.Extensions;
 
 namespace Sanasoppa.API.Hubs;
 
@@ -94,6 +95,7 @@ public class GameHub : Hub
             await Clients.Group(gameId).SendAsync("AllPlayersSubmitted");
             var leader = await _playerService.GetPlayerByIdAsync(Guid.Parse(round.LeaderId));
             var submissions = await _submissionService.GetSubmissionsByRoundIdAsync(Guid.Parse(round.Id));
+            submissions = submissions.Scramble();
             await Clients.Client(leader.ConnectionId).SendAsync("ReadSubmissions", submissions);
         }
         await Clients.Group(gameId).SendAsync("SubmissionSubmitted", await _roundService.GetSubmissionsDoneAsync(Guid.Parse(round.Id)));
