@@ -2,6 +2,8 @@ import { Component, OnInit, signal } from '@angular/core';
 import { GameHubService } from '../../services/game-hub.service';
 import { GameService } from '../../services/game.service';
 import { SubmissionReturnDto } from '../../models/submission-return-dto';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmDeleteModalComponent } from '../../modals/confirm-delete-modal/confirm-delete-modal.component';
 
 @Component({
   selector: 'app-game',
@@ -11,7 +13,8 @@ import { SubmissionReturnDto } from '../../models/submission-return-dto';
 export class GameComponent implements OnInit {
   constructor(
     private gameHub: GameHubService,
-    public game: GameService
+    public game: GameService,
+    private modal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -86,5 +89,18 @@ export class GameComponent implements OnInit {
     this.roundSubmission.set('');
     this.submissions.set([]);
     this.game.status = 'give word';
+  }
+
+  deleteSubmission(playerName: string) {
+    const confirmDeleteModalRef = this.modal.open(ConfirmDeleteModalComponent, {
+      ariaLabelledBy: 'modal-basic-title',
+    });
+
+    confirmDeleteModalRef.componentInstance.playerName = playerName;
+    confirmDeleteModalRef.result.then(() => {
+      this.submissions.update(submissions =>
+        submissions.filter(submission => submission.playerName !== playerName)
+      );
+    });
   }
 }

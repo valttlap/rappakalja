@@ -10,6 +10,7 @@ import { HomeComponent } from './views/home/home.component';
 import { JoinGameComponent } from './views/join-game/join-game.component';
 import { LobbyComponent } from './views/lobby/lobby.component';
 import { GameComponent } from './views/game/game.component';
+import { ConfirmDeleteModalComponent } from './modals/confirm-delete-modal/confirm-delete-modal.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { GameComponent } from './views/game/game.component';
     JoinGameComponent,
     LobbyComponent,
     GameComponent,
+    ConfirmDeleteModalComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, NgbModule, HttpClientModule],
   providers: [{ provide: API_BASE_URL, useValue: `${window.location.origin}` }],

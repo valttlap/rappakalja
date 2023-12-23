@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h2 class="modal-title" id="modal-basic-title">Poista selitys</h2>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="sulje"
+    (click)="dismiss()"></button>
+</div>
+<div class="modal-body">
+  <p>
+    <strong>
+      Haluatko varmasti poistaa pelaajan '{{ playerName }}' vastauksen?
+    </strong>
+  </p>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="dismiss()">
+    Peruuta
+  </button>
+  <button type="button" class="btn btn-danger" (click)="close()">Poista</button>
+</div>
