@@ -30,9 +30,18 @@
   } @else if (game.status === 'read submissions') {
     @if (submissions().length > 0) {
       <ul class="list-group me-3">
-        <li class="list-group-item" *ngFor="let submission of submissions()">
-          <div class="fw-bold">{{ submission.playerName }}</div>
-          {{ submission.guess }}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-start"
+          *ngFor="let submission of submissions()">
+          <div class="ms-2 me-auto">
+            <div class="fw-bold">{{ submission.playerName }}</div>
+            {{ submission.guess }}
+          </div>
+          <button
+            class="btn btn-danger"
+            (click)="deleteSubmission(submission.playerName)">
+            Poista
+          </button>
         </li>
       </ul>
       <button class="btn btn-lg btn-danger" (click)="endRound()">
