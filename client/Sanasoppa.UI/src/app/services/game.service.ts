@@ -16,8 +16,6 @@ export class GameService {
   _isDasher: boolean = false;
   _status: GameStatus = 'wait';
 
-  constructor() {}
-
   get gameId(): string {
     if (!this._gameId) {
       throw new Error('GameId is not initialized');

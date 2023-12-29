@@ -16,5 +16,6 @@ public class PlayerDto
     [Required]
     public string ConnectionId { get; set; } = null!;
 
-    public int Score { get; set; }
+    [Required]
+    public string PlayerId { get; set; } = null!;
 }

@@ -36,4 +36,9 @@ public class SubmissionService
         return _mapper.Map<IEnumerable<SubmissionDto>>(submissions);
     }
 
+    public async Task<bool> HasPlayerSubmittedAsync(string playerId, string roundId)
+    {
+        return await _unitOfWork.SubmissionRepository.HasPlayerSubmittedAsync(Guid.Parse(playerId), Guid.Parse(roundId));
+    }
+
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Sanasoppa.Core.Exceptions;
 using Sanasoppa.Model.Context;
 using Sanasoppa.Model.Entities;
 
@@ -29,6 +30,18 @@ public class PlayerRepository
         return await _context.Players.SingleOrDefaultAsync(p => p.Id == id);
     }
 
+    public async Task<Player?> GetByPlayerIdAsync(string id)
+    {
+        return await _context.Players.SingleOrDefaultAsync(p => p.PlayerId == id);
+    }
+
+    public async Task UpdatePlayerConnectionIdAsync(string playerId, string connectionId)
+    {
+        var player = await GetByPlayerIdAsync(playerId) ?? throw new NotFoundException("Player not found");
+        player.ConnectionId = connectionId;
+        Update(player);
+    }
+
     public async Task<Player?> GetByConnectionIdAsync(string connectionId)
     {
         return await _context.Players.SingleOrDefaultAsync(p => p.ConnectionId == connectionId);
@@ -41,5 +54,22 @@ public class PlayerRepository
         {
             _context.Players.Remove(player);
         }
+    }
+
+    public async Task<bool> PlayerExistsAsync(string playerId)
+    {
+        return await _context.Players.AnyAsync(p => p.PlayerId == playerId);
+    }
+
+    public async Task UpdatePlayerGameAsync(string playerId, Guid gameGuid)
+    {
+        var player = await GetByPlayerIdAsync(playerId) ?? throw new NotFoundException("Player not found");
+        player.GameSessionId = gameGuid;
+        Update(player);
+    }
+
+    public void Update(Player player)
+    {
+        _context.Entry(player).State = EntityState.Modified;
     }
 }

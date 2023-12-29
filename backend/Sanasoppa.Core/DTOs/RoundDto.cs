@@ -9,4 +9,5 @@ public class RoundDto
     public int RoundNumber { get; set; }
 
     public string LeaderId { get; set; } = null!;
+    public string? Word { get; set; }
 }

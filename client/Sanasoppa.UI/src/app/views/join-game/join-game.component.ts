@@ -39,6 +39,7 @@ export class JoinGameComponent implements OnInit {
   }
 
   protected startGame() {
+    if (!this.username()) return;
     this.gameHub.HubConnection.invoke(
       'JoinGame',
       this.joinCodeSgn(),
