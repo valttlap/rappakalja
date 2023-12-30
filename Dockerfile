@@ -1,10 +1,13 @@
 # Stage 1: Build Angular Project
+FROM node:latest as build-node
+
+# Define arguments and set environment variables
 ARG AUTH0_DOMAIN
 ARG AUTH0_CLIENT_ID
 ARG AUTH0_AUDIENCE
 ARG BUILD_ENV
 ENV AUTH0_DOMAIN=$AUTH0_DOMAIN AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID AUTH0_AUDIENCE=$AUTH0_AUDIENCE BUILD_ENV=$BUILD_ENV
-FROM node:latest as build-node
+
 WORKDIR /app
 COPY client/Sanasoppa.UI/package.json client/Sanasoppa.UI/package-lock.json ./
 RUN npm install
