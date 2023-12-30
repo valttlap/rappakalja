@@ -19,7 +19,6 @@ public static class IdentityServiceExtensions
             var settings = config.GetSection("Auth0").Get<Auth0Settings>() ?? throw new ConfigurationException("Auth0 settings not found");
             options.Authority = settings.Authority;
             options.Audience = settings.Audience;
-            options.RequireHttpsMetadata = !env.IsDevelopment();
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
