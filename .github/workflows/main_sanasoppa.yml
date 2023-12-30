@@ -32,6 +32,11 @@ jobs:
         push: true
         tags: sanasoppa.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_0b23776546f248af87980397a5d3497b }}/sanasoppa:${{ github.sha }}
         file: ./Dockerfile
+        build-args: |
+          AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
+          AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
+          BUILD_ENV=${{ secrets.BUILD_ENV }}
 
   deploy:
     runs-on: ubuntu-latest

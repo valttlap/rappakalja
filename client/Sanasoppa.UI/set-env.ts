@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 // Load environment variables from .env file
 dotenv.config();
 
-const isProd = process.env['NODE_ENV'] === 'production';
+const isProd = process.env['BUILD_ENV'] === 'production';
 
 // Define the content of the Angular environment file
 const envConfigFile = `export const environment = {
