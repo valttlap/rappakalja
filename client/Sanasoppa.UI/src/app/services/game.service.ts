@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { GameState } from '../models/game-status';
 
 export type GameStatus =
   | 'wait'
@@ -15,8 +16,6 @@ export class GameService {
   _isOwner: boolean = false;
   _isDasher: boolean = false;
   _status: GameStatus = 'wait';
-
-  constructor() {}
 
   get gameId(): string {
     if (!this._gameId) {
@@ -64,5 +63,20 @@ export class GameService {
 
   set status(status: GameStatus) {
     this._status = status;
+  }
+
+  public static gameStateEnumToStatus(state: GameState): GameStatus {
+    switch (state) {
+      case GameState.Wait:
+        return 'wait';
+      case GameState.SubmitWord:
+        return 'give word';
+      case GameState.SubmitGuess:
+        return 'give submission';
+      case GameState.ReadGuesses:
+        return 'read submissions';
+      default:
+        throw new Error('Invalid GameState');
+    }
   }
 }

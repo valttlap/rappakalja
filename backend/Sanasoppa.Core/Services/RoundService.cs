@@ -74,20 +74,6 @@ public class RoundService
         return false;
     }
 
-    public async Task<SubmissionsDoneDto> GetVotesDoneAsync(Guid roundId)
-    {
-        var round = await _unitOfWork.RoundRepository.GetByIdAsync(roundId) ?? throw new NotFoundException($"Round with id {roundId} not found");
-        var votes = await _unitOfWork.VoteRepository.GetVotesByRoundIdAsync(roundId);
-        var playersInGame = (await _unitOfWork.GameRepository.GetGameSessionByIdAsync(round.GameSessionId) ?? throw new NotFoundException($"Game session with id {round.GameSessionId} not found")).Players.Count;
-        var votesDone = new SubmissionsDoneDto
-        {
-            SubmissionsDone = votes.Count(),
-            SubmissionsTotal = playersInGame - 1
-        };
-
-        return votesDone;
-    }
-
     public async Task<RoundDto> StartNewRoundAsync(string gameId)
     {
         var gameGuid = Guid.TryParse(gameId, out var id) ? id : throw new ArgumentException("Invalid game id");

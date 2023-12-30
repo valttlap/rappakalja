@@ -24,6 +24,11 @@ public class SubmissionRepository
         return await _context.Submissions.Include(s => s.Player).Where(s => s.RoundId == roundId).ToListAsync();
     }
 
+    public async Task<bool> HasPlayerSubmittedAsync(Guid playerId, Guid roundId)
+    {
+        return await _context.Submissions.AnyAsync(s => s.RoundId == roundId && s.PlayerId == playerId);
+    }
+
     public async Task<IEnumerable<Submission>> GetNotCorrectSubmissionsByRoundIdAsync(Guid roundId)
     {
         var roundLeader = await _context.Rounds.Where(r => r.Id == roundId).Select(r => r.LeaderId).SingleOrDefaultAsync();

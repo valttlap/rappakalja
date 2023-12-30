@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 using Sanasoppa.Core.DTOs;
 using Sanasoppa.Core.Exceptions;
 using Sanasoppa.Core.Repositories;
@@ -20,11 +21,7 @@ public class PlayerService
     public async Task<PlayerDto> CreatePlayerAsync(PlayerDto playerDto)
     {
         var player = _mapper.Map<Player>(playerDto);
-        var createdPlayer = await _unitOfWork.PlayerRepository.CreateAsync(player);
-        if (await _unitOfWork.GameRepository.GetOwnerAsync(player.GameSessionId) is null)
-        {
-            await _unitOfWork.GameRepository.SetOwnerAsync(player.GameSessionId, player.Id);
-        }
+        var createdPlayer = await _unitOfWork.PlayerRepository.CreateAsync(player); 
         await _unitOfWork.SaveChangesAsync();
         return _mapper.Map<PlayerDto>(createdPlayer);
     }
@@ -41,10 +38,34 @@ public class PlayerService
         return _mapper.Map<PlayerDto>(player);
     }
 
+    public async Task<PlayerDto> GetPlayerByPlayerIdAsync(string id)
+    {
+        var player = await _unitOfWork.PlayerRepository.GetByPlayerIdAsync(id);
+        return _mapper.Map<PlayerDto>(player);
+    }
+
+    public async Task UpdatePlayerConnectionIdAsync(string playerId, string connectionId)
+    {
+        await _unitOfWork.PlayerRepository.UpdatePlayerConnectionIdAsync(playerId, connectionId);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     public async Task<PlayerDto> GetPlayerByConnectionIdAsync(string connectionId)
     {
         var player = await _unitOfWork.PlayerRepository.GetByConnectionIdAsync(connectionId) ?? throw new NotFoundException($"Player with connection id {connectionId} not found");
         return _mapper.Map<PlayerDto>(player);
+    }
+
+    public async Task<bool> PlayerExistsAsync(string playerId)
+    {
+        return await _unitOfWork.PlayerRepository.PlayerExistsAsync(playerId);
+    }
+
+    public async Task UpdatePlayerGame(string playerId, string gameId)
+    {
+        var gameGuid = Guid.Parse(gameId);
+        await _unitOfWork.PlayerRepository.UpdatePlayerGameAsync(playerId, gameGuid);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeletePlayerByIdAsync(Guid id)

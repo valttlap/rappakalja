@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Sanasoppa.Model.Entities;
@@ -16,6 +16,4 @@ public partial class Submission
     public virtual Player Player { get; set; } = null!;
 
     public virtual Round Round { get; set; } = null!;
-
-    public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 }

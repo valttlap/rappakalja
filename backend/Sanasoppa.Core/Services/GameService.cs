@@ -41,6 +41,21 @@ public class GameService
         return _mapper.Map<GameSessionDto>(gameSession);
     }
 
+    public async Task<bool> HasOwnerAsync(string gameId)
+    {
+        var gameGuid = Guid.Parse(gameId);
+        return (await _unitOfWork.GameRepository.GetOwnerAsync(gameGuid)) is not null;
+    }
+
+    public async Task SetOwnerAync(string gameId, string playerId)
+    {
+        var gameGuid = Guid.Parse(gameId);
+        var playerGuid = Guid.Parse(playerId);
+
+        await _unitOfWork.GameRepository.SetOwnerAsync(gameGuid, playerGuid);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<PlayerDto>> GetPlayersByGameSessionIdAsync(Guid gameSessionId)
     {
         var game = await _unitOfWork.GameRepository.GetGameSessionByIdAsync(gameSessionId) ?? throw new NotFoundException($"Game session with id {gameSessionId} not found");

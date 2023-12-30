@@ -77,4 +77,16 @@ public class GameController : ApiBaseController
         }
     }
 
+    [HttpGet("{id}/status")]
+    [SwaggerResponse(HttpStatusCode.OK, null, Description = "Returns game status")]
+    [SwaggerResponse(HttpStatusCode.NotFound, null, Description = "Game session not found")]
+    [SwaggerResponse(HttpStatusCode.InternalServerError, null, Description = "Internal server error")]
+    [OpenApiOperation("GetStatusByGameSessionId")]
+    [Description("Returns status of the game")]
+
+    public async Task<IActionResult> GetGameStatusAsync([FromRouteAttribute] string id)
+    {
+        throw new NotImplementedException();
+    }
+
 }
