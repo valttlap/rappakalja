@@ -21,11 +21,7 @@ public class PlayerService
     public async Task<PlayerDto> CreatePlayerAsync(PlayerDto playerDto)
     {
         var player = _mapper.Map<Player>(playerDto);
-        var createdPlayer = await _unitOfWork.PlayerRepository.CreateAsync(player);
-        if (await _unitOfWork.GameRepository.GetOwnerAsync(player.GameSessionId) is null)
-        {
-            await _unitOfWork.GameRepository.SetOwnerAsync(player.GameSessionId, player.Id);
-        }
+        var createdPlayer = await _unitOfWork.PlayerRepository.CreateAsync(player); 
         await _unitOfWork.SaveChangesAsync();
         return _mapper.Map<PlayerDto>(createdPlayer);
     }

@@ -4,6 +4,8 @@ import { GameService } from '../../services/game.service';
 import { SubmissionReturnDto } from '../../models/submission-return-dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmDeleteModalComponent } from '../../modals/confirm-delete-modal/confirm-delete-modal.component';
+import { Router } from '@angular/router';
+import { GameRouterData } from '../../models/game-router-data';
 
 @Component({
   selector: 'app-game',
@@ -14,11 +16,19 @@ export class GameComponent implements OnInit {
   constructor(
     private gameHub: GameHubService,
     public game: GameService,
-    private modal: NgbModal
-  ) {}
+    private modal: NgbModal,
+    private router: Router
+  ) {
+    const currentNavigation = this.router.getCurrentNavigation();
+    const state = currentNavigation?.extras.state as { data: GameRouterData };
+    if (state && state.data) {
+      const data: GameRouterData = state.data;
+      this.roundWord.set(data.word ? data.word : '');
+      this.submissions.set(data.submissions);
+    }
+  }
 
   ngOnInit(): void {
-    console.log(this.game.status);
     this.gameHub.HubConnection.on('WordSubmitted', (word: string) => {
       this.roundSubmission.set('');
       this.roundWord.set(word);

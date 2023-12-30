@@ -33,7 +33,7 @@ import { environment } from '../environments/environment';
       clientId: environment.auth0.clientId,
       authorizationParams: {
         redirect_uri: window.location.origin,
-        audience: 'https://localhost:7020',
+        audience: environment.auth0.authorizationParams.audience,
       },
       cacheLocation: 'localstorage',
       httpInterceptor: {

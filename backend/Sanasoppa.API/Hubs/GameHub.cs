@@ -50,10 +50,15 @@ public class GameHub : Hub
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = username,
+                PlayerId = userId,
                 ConnectionId = Context.ConnectionId,
                 GameSessionId = gameSession.Id,
             };
             await _playerService.CreatePlayerAsync(player);
+        }
+        if (!await _gameService.HasOwnerAsync(gameSession.Id))
+        {
+            await _gameService.SetOwnerAync(gameSession.Id, player.Id);
         }
         await Groups.AddToGroupAsync(Context.ConnectionId, gameSession.Id);
         await Clients.Group(gameSession.Id).SendAsync("PlayerJoined", player);
@@ -157,8 +162,9 @@ public class GameHub : Hub
         var gameSession = await GetGameSessionAsync(player);
         var currentRound = await GetCurrentRoundAsync(gameSession) ?? throw new ApplicationException("Round not found or game not started");
         var isLeader = IsLeader(currentRound, player);
+        await Groups.AddToGroupAsync(Context.ConnectionId, gameSession.Id);
 
-        return await DetermineGameStatus(player, currentRound, isLeader);
+        return await DetermineGameStatus(gameSession, player, currentRound, isLeader);
     }
 
     private ClaimsPrincipal ValidateCurrentUser()
@@ -181,14 +187,20 @@ public class GameHub : Hub
         return await _roundService.GetCurrentRoundByGameSessionIdAsync(Guid.Parse(gameSession.Id));
     }
 
-    private bool IsLeader(RoundDto currentRound, PlayerDto player)
+    private static bool IsLeader(RoundDto currentRound, PlayerDto player)
     {
         return currentRound?.LeaderId == player.Id;
     }
 
-    private async Task<GameStatusDto> DetermineGameStatus(PlayerDto player, RoundDto currentRound, bool isLeader)
+    private async Task<GameStatusDto> DetermineGameStatus(GameSessionDto game, PlayerDto player, RoundDto currentRound, bool isLeader)
     {
-        var gameStatus = new GameStatusDto();
+        var gameStatus = new GameStatusDto
+        {
+            IsDasher = isLeader,
+            GameId = game.Id,
+            JoinCode = game.JoinCode!,
+            IsOwner = game.OwnerId == player.Id
+        };
 
         if (currentRound?.Word is null)
         {
