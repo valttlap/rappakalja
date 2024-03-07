@@ -29,6 +29,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<PlayerService>();
         services.AddScoped<RoundService>();
         services.AddScoped<SubmissionService>();
+        services.AddScoped<SettingsService>();
 
         services.AddOpenApiDocument(config =>
         {

@@ -1,0 +1,15 @@
+<div class="container">
+  <h2>Liity koodilla: {{ gameService.joinCode }}</h2>
+  <ul class="list-group me-3">
+    @for (player of players(); track player) {
+      <li class="list-group-item">
+        {{ player }}
+      </li>
+    }
+  </ul>
+  @if (isOwner()) {
+    <button class="btn btn-lg btn-primary" (click)="startGame()">
+      Aloita peli
+    </button>
+  }
+</div>

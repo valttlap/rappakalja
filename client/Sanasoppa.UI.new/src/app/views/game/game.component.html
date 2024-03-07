@@ -1,0 +1,58 @@
+<div>
+  @if (game.status === 'give word') {
+    <div class="mb-3">
+      <label for="giveWordInput" class="form-label"
+        >Syötä kierroksen sana</label
+      >
+      <input
+        type="text"
+        class="form-control"
+        id="giveWordInput"
+        (keyup)="updateWord($event)" />
+    </div>
+    <button class="btn bn-lg btn-primary" (click)="submitWord()">Lähetä</button>
+  } @else if (game.status === 'wait') {
+    <div class="alert alert-info" role="alert">Odota</div>
+  } @else if (game.status === 'give submission') {
+    <div class="mb-3">
+      <label for="submissionTextArea" class="form-label"
+        >Syötä selitys sanalle '{{ roundWord() }}'</label
+      >
+      <textarea
+        class="form-control"
+        id="submissionTextArea"
+        rows="3"
+        (change)="updateSubmission($event)"></textarea>
+    </div>
+    <button class="btn bn-lg btn-primary" (click)="submitSubmission()">
+      Lähetä
+    </button>
+  } @else if (game.status === 'read submissions') {
+    @if (submissions().length > 0) {
+      <ul class="list-group me-3">
+        @for (submission of submissions(); track submission) {
+          <li
+            class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">{{ submission.playerName }}</div>
+              {{ submission.guess }}
+            </div>
+            <button
+              class="btn btn-danger"
+              (click)="deleteSubmission(submission.playerName)">
+              Poista
+            </button>
+          </li>
+        }
+      </ul>
+      <button class="btn btn-lg btn-danger" (click)="endRound()">
+        Päätä kierros
+      </button>
+      <button class="btn btn-lg btn-secondary" (click)="restartRound()">
+        Aloita kierros uudelleen
+      </button>
+    } @else {
+      <div class="alert alert-info" role="alert">Odota vastauksia</div>
+    }
+  }
+</div>
