@@ -6,6 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmDeleteModalComponent } from '../../modals/confirm-delete-modal/confirm-delete-modal.component';
 import { Router } from '@angular/router';
 import { GameRouterData } from '../../models/game-router-data';
+import { GameStatusDto } from '../../models/game-status';
 
 @Component({
   selector: 'app-game',
@@ -113,4 +114,19 @@ export class GameComponent implements OnInit {
       );
     });
   }
+
+  protected async getStatus() {
+      const status: GameStatusDto =
+        await this.gameHub.HubConnection.invoke('GetGameStatus');
+      this.game.joinCode = status.joinCode;
+      this.game.gameId = status.gameId;
+      this.game.isDasher = status.isDasher;
+      this.game.isOwner = status.isOwner;
+      this.game.status = GameService.gameStateEnumToStatus(status.state);
+      const routerData: GameRouterData = {
+        word: status.word,
+        submissions: status.submissions,
+      };
+      this.router.navigate(['/game'], { state: { data: routerData } });
+    }
 }
